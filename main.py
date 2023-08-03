@@ -7,9 +7,10 @@ from data import update_or_get_data
 from uploads_analyzer import uploads_analyze
 
 NAME = 'Findanime Uploader'
+VERSION = 0.01
 
 master = tkinter.Tk()
-master.title(NAME)
+master.title(f'{NAME} v{VERSION:.2f}')
 master.geometry('865x500')
 master.resizable(False, False)
 

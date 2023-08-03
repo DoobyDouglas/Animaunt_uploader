@@ -102,7 +102,9 @@ def findanime(anime):
     driver.execute_script("arguments[0].innerHTML = arguments[1];", div_with_select, new_html)
 
     # надо добавить будет клик на пост стр, и выводить ссылку в программу, когда он запостил found_episode_link вот эту.
-    driver.quit()
+    # driver.quit()
+    driver.find_element(By.CLASS_NAME, 'btn-success').click()
+    return found_episode_link
 
 
 if __name__ == '__main__':

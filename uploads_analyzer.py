@@ -109,8 +109,7 @@ def uploads_analyze(uploads: str, master: tkinter.Tk):
             if flag:
                 anime_list.append(epsd)
     for anime in anime_list:
-        # link = findanime(anime)
-        link = 'Тут ссылка из функции "findanime"'
+        link = findanime(anime)
         text = master.nametowidget('links_list_frame.!text')
         text.config(state='normal')
         text.insert(tkinter.END, f'{link}\n')
