@@ -10,7 +10,7 @@ NAME = 'Findanime Uploader'
 
 master = tkinter.Tk()
 master.title(NAME)
-master.geometry('575x500')
+master.geometry('865x500')
 master.resizable(False, False)
 
 style = Style(theme='superhero')
@@ -50,12 +50,12 @@ add_ttl_bttn = ttk.Button(
 add_ttl_bttn.grid(column=0, row=6, pady=10, padx=5)
 
 upload_list_frame = ttk.Frame(master, name='upload_list_frame')
-upload_list_frame.pack(side='right', anchor='ne', padx=15, pady=10)
+upload_list_frame.pack(side='left', anchor='ne', padx=15, pady=10)
 
 upload_list_lbl = ttk.Label(upload_list_frame, text='Список заливок')
 upload_list_lbl.grid(column=0, row=0, pady=5, padx=5, sticky='w')
 
-uploads = ttk.Text(upload_list_frame, width=60)
+uploads = ttk.Text(upload_list_frame, width=50, wrap='none')
 uploads.grid(column=0, row=1, pady=5, padx=5)
 
 upload_bttn = ttk.Button(
@@ -68,6 +68,15 @@ upload_bttn = ttk.Button(
     ),
 )
 upload_bttn.grid(column=0, row=2, pady=10, padx=5, sticky='se')
+
+links_list_frame = ttk.Frame(master, name='links_list_frame')
+links_list_frame.pack(side='left', anchor='ne', padx=10, pady=10)
+
+links_list_lbl = ttk.Label(links_list_frame, text='Список загрузок')
+links_list_lbl.grid(column=0, row=0, pady=5, padx=5, sticky='w')
+
+links = ttk.Text(links_list_frame, width=50, wrap='none', state='disabled')
+links.grid(column=0, row=1, pady=5, padx=5)
 
 
 if __name__ == '__main__':

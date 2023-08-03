@@ -36,9 +36,7 @@ class Anime:
                     By.XPATH,
                     './following-sibling::input'
                 ).get_attribute('value')
-                driver.quit()
                 return code_value
-        driver.quit()
 
 
 def uploads_toplvl(
@@ -93,25 +91,31 @@ def uploads_analyze(uploads: str, master: tkinter.Tk):
         number = line.split()[-1]
         if number.isdigit():
             name = ' '.join(line.split()[:-1])
-            episode = Anime(name, number)
+            epsd = Anime(name, number)
             flag = False
-            if episode.name in data:
-                episode.animaunt_link = data[episode.name]['animaunt_link']
-                episode.findanime_link = data[episode.name]['findanime_link']
+            if epsd.name in data:
+                epsd.animaunt_link = data[epsd.name]['animaunt_link']
+                epsd.findanime_link = data[epsd.name]['findanime_link']
                 flag = True
             else:
-                uploads_toplvl(master, episode)
+                uploads_toplvl(master, epsd)
                 data = update_or_get_data(get=True)
                 try:
-                    episode.animaunt_link = data[episode.name]['animaunt_link']
-                    episode.findanime_link = data[episode.name]['findanime_link']
+                    epsd.animaunt_link = data[epsd.name]['animaunt_link']
+                    epsd.findanime_link = data[epsd.name]['findanime_link']
                     flag = True
                 except KeyError:
                     pass
             if flag:
-                anime_list.append(episode)
+                anime_list.append(epsd)
     for anime in anime_list:
-        findanime(anime)
+        # link = findanime(anime)
+        link = 'Тут ссылка из функции "findanime"'
+        text = master.nametowidget('links_list_frame.!text')
+        text.config(state='normal')
+        text.insert(tkinter.END, f'{link}\n')
+        text.config(state='normal')
+        text.config(state='disabled')
 
 
 if __name__ == '__main__':
