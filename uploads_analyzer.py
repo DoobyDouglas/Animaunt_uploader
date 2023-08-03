@@ -85,6 +85,8 @@ def uploads_toplvl(
 
 
 def uploads_analyze(uploads: str, master: tkinter.Tk):
+    upload_bttn = master.nametowidget('upload_list_frame.upload_bttn')
+    upload_bttn.config(state='disabled')
     anime_list = []
     data = update_or_get_data(get=True)
     for line in uploads.splitlines():
@@ -115,6 +117,7 @@ def uploads_analyze(uploads: str, master: tkinter.Tk):
         text.insert(tkinter.END, f'{link}\n')
         text.config(state='normal')
         text.config(state='disabled')
+    upload_bttn.config(state='normal')
 
 
 if __name__ == '__main__':
