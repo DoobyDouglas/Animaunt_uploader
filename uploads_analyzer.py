@@ -129,12 +129,15 @@ def uploads_analyze(uploads: str, master: tk.Tk):
                         pass
             if flag:
                 anime_list.append(epsd)
+    pb = master.nametowidget('links_list_frame.pb')
+    pb.config(maximum=(len(anime_list) * 2))
     for anime in anime_list:
         link = findanime(anime)
         text = master.nametowidget('links_list_frame.findanime_links')
         text.config(state=tk.NORMAL)
         text.insert(tk.END, f'{link}\n')
         text.config(state=tk.DISABLED)
+        pb.step(1)
     flag = False
     while not flag:
         try:
@@ -154,7 +157,9 @@ def uploads_analyze(uploads: str, master: tk.Tk):
         text.config(state=tk.NORMAL)
         text.insert(tk.END, f'{link}\n')
         text.config(state=tk.DISABLED)
+        pb.step(1)
     upload_bttn.config(state=tk.NORMAL)
+    pb['value'] = 0
 
 
 if __name__ == '__main__':

@@ -12,7 +12,7 @@ from config import get_config
 
 
 NAME = 'AnimauntUploader'
-VERSION = 0.03
+VERSION = 0.04
 
 
 def on_upload_bttn(
@@ -31,6 +31,7 @@ master.geometry('1218x500')
 master.resizable(False, False)
 
 style = Style(theme='superhero')
+style.configure('Horizontal.TProgressbar', thickness=25)
 
 add_ttl_frame = ttk.Frame(master, name='add_ttl_frame')
 add_ttl_frame.pack(side='left', anchor='nw', padx=10, pady=10)
@@ -136,6 +137,14 @@ findanime_links = ttk.Text(
     state=tk.DISABLED,
 )
 findanime_links.grid(column=0, row=1, pady=5, padx=5)
+
+pb = ttk.Progressbar(
+    links_list_frame,
+    mode='determinate',
+    name='pb',
+    length=664,
+)
+pb.grid(column=0, row=2, pady=10, padx=5, sticky='w', columnspan=2)
 
 anime_365_list_lbl = ttk.Label(
     links_list_frame,
