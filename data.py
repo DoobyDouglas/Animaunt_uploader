@@ -1,14 +1,29 @@
 import json
 import os
-from pprint import pprint
 from typing import Dict
 import tkinter
+from tkinter import messagebox
+from tkinter import filedialog
+from config import write_config
+
+
+def path_choice(master: tkinter.Tk = None):
+    path = filedialog.askdirectory(title='Выберите папку с аниме')
+    if path:
+        write_config('anime_path', path)
+        bttn = master.nametowidget('add_folder_frame.add_folder_bttn')
+        bttn['text'] = 'Папка выбрана'
+        bttn.config(bootstyle='success')
+    else:
+        messagebox.showinfo('Ошибка', 'Папка не выбрана')
+        return
 
 
 def update_or_get_data(
         name: str = None,
         animaunt_link: str = None,
         findanime_link: str = None,
+        anime_365_link: str = None,
         get: bool = False,
         master: tkinter.Tk = None,
         ) -> Dict or None:
@@ -20,10 +35,20 @@ def update_or_get_data(
         data = json.load(json_file)
     if get:
         return data
+    if name == '':
+        messagebox.showinfo('Нет названия', 'Введите название')
+        return
+    if animaunt_link == '':
+        messagebox.showinfo(
+            'Нет ссылки',
+            'Введите ссылку на редактирование Animaunt'
+        )
+        return
     if name not in data:
         data[name] = {
             'animaunt_link': animaunt_link,
-            'findanime_link': findanime_link
+            'findanime_link': findanime_link,
+            'anime_365_link': anime_365_link,
         }
     with open('anime.json', 'w', encoding='utf-8') as json_file:
         json.dump(data, json_file)
@@ -31,6 +56,7 @@ def update_or_get_data(
         master.nametowidget('add_ttl_frame.!entry').delete(0, 'end')
         master.nametowidget('add_ttl_frame.!entry2').delete(0, 'end')
         master.nametowidget('add_ttl_frame.!entry3').delete(0, 'end')
+        master.nametowidget('add_ttl_frame.!entry4').delete(0, 'end')
         try:
             master.nametowidget('.uploads_toplvl').destroy()
         except KeyError:

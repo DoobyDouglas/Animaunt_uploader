@@ -1,9 +1,13 @@
-from data import update_or_get_data
+from data import update_or_get_data, path_choice
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from slnm import get_options, findanime
-import tkinter
+from slnm import get_options, findanime, anime365
+from config import get_config
+from searchfolder import find_single_folder, find_file
+import tkinter as tk
 import ttkbootstrap as ttk
+import os
+import time
 
 
 class Anime:
@@ -13,11 +17,13 @@ class Anime:
             number,
             animaunt_link=None,
             findanime_link=None,
+            anime_365_link=None,
             ) -> None:
         self.name = name
         self.number = number
         self.animaunt_link = animaunt_link
         self.findanime_link = findanime_link
+        self.anime_365_link = anime_365_link
 
     def __str__(self) -> str:
         return self.name
@@ -40,12 +46,12 @@ class Anime:
 
 
 def uploads_toplvl(
-        master: tkinter.Tk,
+        master: tk.Tk,
         episode: Anime,
         ):
-    uplds = tkinter.Toplevel(master, name='uploads_toplvl')
+    uplds = tk.Toplevel(master, name='uploads_toplvl')
     uplds.title('Uploads Data')
-    uplds.geometry('392x230')
+    uplds.geometry('392x300')
     uplds.resizable(False, False)
 
     title_name_lbl = ttk.Label(
@@ -67,6 +73,12 @@ def uploads_toplvl(
     findanime_link_entry = ttk.Entry(uplds, width=60)
     findanime_link_entry.grid(column=0, row=4, pady=6, padx=8)
 
+    anime_365_link_name_lbl = ttk.Label(uplds, text='Ссылка на Аnime 365')
+    anime_365_link_name_lbl.grid(column=0, row=5, pady=6, padx=6, sticky='n')
+
+    anime_365_link_entry = ttk.Entry(uplds, width=60)
+    anime_365_link_entry.grid(column=0, row=6, pady=6, padx=8)
+
     add_ttl_bttn = ttk.Button(
         uplds,
         text='Добавить ссылки',
@@ -75,18 +87,22 @@ def uploads_toplvl(
             episode.name,
             animaunt_link_entry.get().strip(),
             findanime_link_entry.get().strip(),
+            anime_365_link_entry.get().strip(),
             master=master,
         ),
     )
-    add_ttl_bttn.grid(column=0, row=5, pady=12, padx=10)
+    add_ttl_bttn.grid(column=0, row=7, pady=12, padx=10)
 
+    uplds.wm_attributes('-topmost', 1)
+    uplds.wm_attributes('-topmost', 0)
+    uplds.grab_set()
     uplds.focus_force()
     uplds.wait_window()
 
 
-def uploads_analyze(uploads: str, master: tkinter.Tk):
+def uploads_analyze(uploads: str, master: tk.Tk):
     upload_bttn = master.nametowidget('upload_list_frame.upload_bttn')
-    upload_bttn.config(state='disabled')
+    upload_bttn.config(state=tk.DISABLED)
     anime_list = []
     data = update_or_get_data(get=True)
     for line in uploads.splitlines():
@@ -98,26 +114,47 @@ def uploads_analyze(uploads: str, master: tkinter.Tk):
             if epsd.name in data:
                 epsd.animaunt_link = data[epsd.name]['animaunt_link']
                 epsd.findanime_link = data[epsd.name]['findanime_link']
+                epsd.anime_365_link = data[epsd.name]['anime_365_link']
                 flag = True
             else:
-                uploads_toplvl(master, epsd)
-                data = update_or_get_data(get=True)
-                try:
-                    epsd.animaunt_link = data[epsd.name]['animaunt_link']
-                    epsd.findanime_link = data[epsd.name]['findanime_link']
-                    flag = True
-                except KeyError:
-                    pass
+                while not flag:
+                    uploads_toplvl(master, epsd)
+                    data = update_or_get_data(get=True)
+                    try:
+                        epsd.animaunt_link = data[epsd.name]['animaunt_link']
+                        epsd.findanime_link = data[epsd.name]['findanime_link']
+                        epsd.anime_365_link = data[epsd.name]['anime_365_link']
+                        flag = True
+                    except KeyError:
+                        pass
             if flag:
                 anime_list.append(epsd)
     for anime in anime_list:
         link = findanime(anime)
-        text = master.nametowidget('links_list_frame.!text')
-        text.config(state='normal')
-        text.insert(tkinter.END, f'{link}\n')
-        text.config(state='normal')
-        text.config(state='disabled')
-    upload_bttn.config(state='normal')
+        text = master.nametowidget('links_list_frame.findanime_links')
+        text.config(state=tk.NORMAL)
+        text.insert(tk.END, f'{link}\n')
+        text.config(state=tk.DISABLED)
+    flag = False
+    while not flag:
+        try:
+            config = get_config()
+            if config['PATHS']['anime_path'] != '':
+                folder = config['PATHS']['anime_path']
+                flag = True
+            else:
+                path_choice(master)
+        except KeyError:
+            path_choice(master)
+    for anime in anime_list:
+        found_folder = find_single_folder(folder, anime.name)
+        file_path = find_file(found_folder, anime.get_link().split('/')[-1])
+        link = anime365(anime, os.path.normpath(file_path))
+        text = master.nametowidget('links_list_frame.anime_365_links')
+        text.config(state=tk.NORMAL)
+        text.insert(tk.END, f'{link}\n')
+        text.config(state=tk.DISABLED)
+    upload_bttn.config(state=tk.NORMAL)
 
 
 if __name__ == '__main__':

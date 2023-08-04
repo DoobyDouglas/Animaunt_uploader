@@ -8,6 +8,7 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+anime.json
 build/
 develop-eggs/
 dist/
