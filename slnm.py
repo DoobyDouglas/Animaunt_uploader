@@ -49,7 +49,7 @@ def found():
 def findanime(anime):
     if anime.findanime_link == '':
         return 'Нет на Findanime'
-    code_value = anime.get_link()
+    code_value = anime.link
     options = get_options()
     entry_number = anime.number
     url = anime.findanime_link
