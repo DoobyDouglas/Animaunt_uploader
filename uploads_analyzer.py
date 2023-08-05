@@ -8,6 +8,7 @@ import tkinter as tk
 import ttkbootstrap as ttk
 import os
 import time
+import re
 
 
 class Anime:
@@ -36,7 +37,11 @@ class Anime:
         options = get_options()
         seria = f'{self.number} серия'
         driver = webdriver.Chrome(options=options)
-        driver.get(self.animaunt_link)
+        link_animaunt = self.animaunt_link
+        pattern = r"https://animaunt\.(org|tv)/(\d+)-"
+        match = re.search(pattern, link_animaunt)
+        id_animaunt = match.group(2)
+        driver.get(f'https://animaunt.org/私は独身です.php?mod=editnews&action=editnews&id={id_animaunt}')
         tabplayer1 = driver.find_element(By.ID, "tabplayer1")
         divs = tabplayer1.find_elements(By.CLASS_NAME, 'col-sm-12')
         for div in divs:
