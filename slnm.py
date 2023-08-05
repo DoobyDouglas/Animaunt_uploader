@@ -20,7 +20,21 @@ def get_options():
     return options
 
 
-def found():
+def findanime(anime, key):
+    if not anime.findanime_link:
+        return 'Нет на Findanime'
+    if key == 'anime':
+        code_value = anime.link
+    else:
+        code_value = ''
+    options = get_options()
+    entry_number = anime.number
+    if key == 'anime':
+        url = anime.findanime_link
+    else:
+        url = ''
+    driver = webdriver.Chrome(options=options)
+    driver.get(url)
     found_episode_element = None
     exclude_list = []
     exclude_number = 'and not(contains(., "Серия 10000"))'
@@ -33,10 +47,8 @@ def found():
                     found_episode_element = driver.find_element(By.XPATH, episode_xpath)
                     found_episode_text = found_episode_element.get_attribute('text')
                     match = re.search(r'Серия (\d+)', found_episode_text)
-                    m = match.group(0)
                     if match.group(0) == f'Серия {episode_number}':
                         found_episode_link = found_episode_element.get_attribute('href')
-                        print(found_episode_link)
                         break
                     else:
                         exclude_number = exclude_number + f' and not(contains(., "{match.group(0)}"))'
@@ -45,60 +57,64 @@ def found():
                 except Exception:
                     continue
 
-
-def findanime(anime):
-    if anime.findanime_link == '':
-        return 'Нет на Findanime'
-    code_value = anime.link
-    options = get_options()
-    entry_number = anime.number
-    url = anime.findanime_link
-    driver = webdriver.Chrome(options=options)
-    driver.get(url)
-    found_episode_element = driver.find_element(By.XPATH, f'//a[contains(.,"Серия {entry_number}")]')
-    found_episode_link = found_episode_element.get_attribute('href')
     driver.get(found_episode_link)
     add_video = driver.find_element(By.XPATH, '//a[contains(.,"Добавить видео")]')
     add_video_href = add_video.get_attribute("href")
     driver.get(add_video_href)
     textarea_element = driver.find_element(By.ID, "url")
-    text_to_insert = f'<iframe allowfullscreen="" src = "https://animaunt.org/{code_value}" style="border: medium none;" width="100%" height="100%" frameborder="0"></iframe>'
+
+    if key == 'anime':
+        text_to_insert = f'<iframe allowfullscreen="" src="https://animaunt.org/{code_value}" style="border: medium none;" width="100%" height="100%" frameborder="0"></iframe>'
+    else:
+        text_to_insert = f'<iframe allowfullscreen="" src="https://anime.malfurik.online/play.php?video={code_value}" style="border: medium none;" width="100%" height="100%" frameborder="0"></iframe>'
+
     textarea_element.send_keys(text_to_insert)
     translation_select = Select(driver.find_element(By.ID, "translationType"))
-    translation_select.select_by_visible_text("Многоголосый")
-    div_with_select = driver.find_element(By.XPATH, "//div[select[@placeholder='Начните писать...']]")
-    new_html = """
-        <select name="personAndType" class="select-role-null form-control selectized" multiple="multiple" placeholder="Начните писать..." style="display: none;" tabindex="-1">
-            <option value="7035:4" selected="selected">AniMaunt</option>
-        </select>
-        <div class="selectize-control select-role-null form-control multi plugin-remove_button">
-            <div class="selectize-input items not-full has-options has-items">
-                <div class="item active" data-value="7035:4">AniMaunt <span class="label label-info">Переводчик</span>
-                    <a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a>
+
+    if key == 'anime':
+        translation_select.select_by_visible_text("Многоголосый")
+    else:
+        translation_select.select_by_visible_text("Озвучка")
+
+    select_element = driver.find_element(By.NAME, "personAndType").text
+    if "AniMaunt (Переводчик)" in select_element:
+        pass
+    else:
+        div_with_select = driver.find_element(By.XPATH, "//div[select[@placeholder='Начните писать...']]")
+        new_html = """
+            <select name="personAndType" class="select-role-null form-control selectized" multiple="multiple" placeholder="Начните писать..." style="display: none;" tabindex="-1">
+                <option value="7035:4" selected="selected">AniMaunt</option>
+            </select>
+            <div class="selectize-control select-role-null form-control multi plugin-remove_button">
+                <div class="selectize-input items not-full has-options has-items">
+                    <div class="item active" data-value="7035:4">AniMaunt <span class="label label-info">Переводчик</span>
+                        <a href="javascript:void(0)" class="remove" tabindex="-1" title="Remove">×</a>
+                    </div>
+                    <input type="select-multiple" autocomplete="off" autofill="no" tabindex="" style="width: 4px; opacity: 1; position: relative; left: 0px;">
                 </div>
-                <input type="select-multiple" autocomplete="off" autofill="no" tabindex="" style="width: 4px; opacity: 1; position: relative; left: 0px;">
+                <div class="selectize-dropdown multi select-role-null form-control plugin-remove_button" style="display: none; visibility: visible; width: 326.656px; top: 40.9844px; left: 0px;">
+                    <div class="selectize-dropdown-content" tabindex="-1"></div>
+                </div>
             </div>
-            <div class="selectize-dropdown multi select-role-null form-control plugin-remove_button" style="display: none; visibility: visible; width: 326.656px; top: 40.9844px; left: 0px;">
-                <div class="selectize-dropdown-content" tabindex="-1"></div>
-            </div>
-        </div>
-        <script type="text/javascript">
-            $(function (){
-                rm_h.addAjaxSelectize('.select-role-null', {
-                    ajaxUrl: '/search/personsRoles?forChapter=true',
-                    maxItems: 2
-                });
-            })
-        </script>
-    """
-    driver.execute_script("arguments[0].innerHTML = arguments[1];", div_with_select, new_html)
+            <script type="text/javascript">
+                $(function (){
+                    rm_h.addAjaxSelectize('.select-role-null', {
+                        ajaxUrl: '/search/personsRoles?forChapter=true',
+                        maxItems: 2
+                    });
+                })
+            </script>
+        """
+        driver.execute_script("arguments[0].innerHTML = arguments[1];", div_with_select, new_html)
     driver.find_element(By.CLASS_NAME, 'btn-success').click()
     return found_episode_link
 
 
 def anime365(anime, file_path):
-    if anime.anime_365_link == '':
+    if not anime.anime_365_link:
         return 'Нет на Аnime 365'
+    if not anime.path:
+        return 'Не указан путь к тайтлу'
     entry_number = anime.number
     link_365 = anime.anime_365_link
     options = get_options()
