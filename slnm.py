@@ -122,9 +122,8 @@ def anime365(anime, file_path):
     wait = WebDriverWait(driver, 10000)
     wait.until(EC.presence_of_element_located((By.CLASS_NAME, "qq-upload-success")))
     add_btn = driver.find_element(By.XPATH, "//button[contains(text(), 'Добавить перевод')]")
-    link_next_step = add_btn.get_attribute('href')
     add_btn.click()
-    driver.get(link_next_step)
+    WebDriverWait(driver, 100).until(EC.url_changes(link_add))
     card_div = driver.find_element(By.CLASS_NAME, 'card-content')
     upload_link_365 = card_div.find_element(By.TAG_NAME, 'a').get_attribute('href')
     return upload_link_365
