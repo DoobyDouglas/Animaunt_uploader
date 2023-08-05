@@ -51,7 +51,7 @@ def uploads_toplvl(
         ):
     uplds = tk.Toplevel(master, name='uploads_toplvl')
     uplds.title('Uploads Data')
-    uplds.geometry('392x300')
+    uplds.geometry('392x300+400+100')
     uplds.resizable(False, False)
 
     title_name_lbl = ttk.Label(
@@ -152,7 +152,7 @@ def uploads_analyze(uploads: str, master: tk.Tk):
     for anime in anime_list:
         found_folder = find_single_folder(folder, anime.name)
         file_path = find_file(found_folder, anime.get_link().split('/')[-1])
-        link = anime365(anime, os.path.normpath(file_path))
+        link = anime365(anime, file_path)
         text = master.nametowidget('links_list_frame.anime_365_links')
         text.config(state=tk.NORMAL)
         text.insert(tk.END, f'{link}\n')

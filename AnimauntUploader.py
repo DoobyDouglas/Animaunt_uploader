@@ -1,4 +1,4 @@
-# pyinstaller --noconfirm --noconsole --onefile AnimauntUploader.py
+# pyinstaller --noconfirm --onefile AnimauntUploader.py
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -27,7 +27,7 @@ config = get_config()
 
 master = tk.Tk()
 master.title(f'{NAME} v{VERSION:.2f}')
-master.geometry('1218x500')
+master.geometry('1215x478+500+150')
 master.resizable(False, False)
 
 style = Style(theme='superhero')
