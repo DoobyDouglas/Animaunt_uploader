@@ -8,11 +8,10 @@ import ttkbootstrap as ttk
 from data import update_or_get_data, path_choice
 from uploads_analyzer import uploads_analyze
 from threading import Thread
-from config import get_config
 
 
 NAME = 'AnimauntUploader'
-VERSION = 0.07
+VERSION = 0.09
 
 
 def on_upload_bttn(
@@ -22,8 +21,6 @@ def on_upload_bttn(
     thread = Thread(target=uploads_analyze, args=(uploads, master))
     thread.start()
 
-
-config = get_config()
 
 master = tk.Tk()
 master.title(f'{NAME} v{VERSION:.2f}')
@@ -86,11 +83,6 @@ add_ttl_bttn = ttk.Button(
     ),
 )
 add_ttl_bttn.grid(column=0, row=10, pady=38, padx=5)
-
-# add_folder_frame = ttk.Frame(master, name='add_folder_frame')
-# add_folder_frame.place(anchor='nw', y=355, x=10)
-
-
 
 upload_list_frame = ttk.Frame(master, name='upload_list_frame')
 upload_list_frame.pack(side='left', anchor='ne', padx=15, pady=10)

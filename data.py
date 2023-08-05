@@ -48,10 +48,10 @@ def update_or_get_data(
         data = json.load(json_file)
     if get:
         return data
-    if name == '':
+    if not name:
         messagebox.showinfo('Нет названия', 'Введите название')
         return
-    if animaunt_link == '':
+    if not animaunt_link:
         messagebox.showinfo(
             'Нет ссылки',
             'Введите ссылку на редактирование Animaunt'
@@ -65,6 +65,8 @@ def update_or_get_data(
         }
         if name in PATHS:
             data[name]['path'] = PATHS[name]
+        else:
+            data[name]['path'] = None
     with open('anime.json', 'w', encoding='utf-8') as json_file:
         json.dump(data, json_file)
     if not get and master:

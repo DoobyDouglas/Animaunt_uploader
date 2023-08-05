@@ -2,12 +2,9 @@ from data import update_or_get_data, path_choice
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from slnm import get_options, findanime, anime365
-from config import get_config
-from searchfolder import find_single_folder, find_file
+from searchfolder import find_file
 import tkinter as tk
 import ttkbootstrap as ttk
-import os
-import time
 import re
 
 
@@ -128,77 +125,68 @@ def uploads_toplvl(
 def uploads_analyze(uploads: str, master: tk.Tk):
     upload_bttn = master.nametowidget('upload_list_frame.upload_bttn')
     upload_bttn.config(state=tk.DISABLED)
+    txt_widget_names = [
+        'links_list_frame.findanime_links',
+        'links_list_frame.anime_365_links'
+    ]
+    for widget_name in txt_widget_names:
+        text = master.nametowidget(widget_name)
+        text.config(state=tk.NORMAL)
+        text.delete('1.0', tk.END)
+        text.config(state=tk.DISABLED)
     anime_list = []
     data = update_or_get_data(get=True)
-    for line in uploads.splitlines():
-        number = line.split()[-1]
-        if number.isdigit():
-            name = ' '.join(line.split()[:-1])
-            epsd = Anime(name, number)
-            flag = False
-            if epsd.name in data:
-                epsd.animaunt_link = data[epsd.name]['animaunt_link']
-                epsd.findanime_link = data[epsd.name]['findanime_link']
-                epsd.anime_365_link = data[epsd.name]['anime_365_link']
-                epsd.path = data[epsd.name]['path']
-                flag = True
-            else:
-                while not flag:
-                    uploads_toplvl(master, epsd)
-                    data = update_or_get_data(get=True)
-                    try:
-                        epsd.animaunt_link = data[epsd.name]['animaunt_link']
-                        epsd.findanime_link = data[epsd.name]['findanime_link']
-                        epsd.anime_365_link = data[epsd.name]['anime_365_link']
-                        epsd.path = data[epsd.name]['path']
-                        flag = True
-                    except KeyError:
-                        pass
-            anime_list.append(epsd)
-    pb = master.nametowidget('links_list_frame.pb')
-    pb.config(maximum=(len(anime_list) * 2))
-    for anime in anime_list:
-        anime.get_link()
-        # print(anime.name)
-        # print(anime.animaunt_link)
-        # print(anime.findanime_link)
-        # print(anime.anime_365_link)
-        # print(anime.path)
-        # print(anime.file)
-        # print(anime.link)
-    for anime in anime_list:
-        link = findanime(anime)
+
+    try:
+        for line in uploads.splitlines():
+            number = line.split()[-1]
+            if number.isdigit():
+                name = ' '.join(line.split()[:-1])
+                epsd = Anime(name, number)
+                flag = False
+                if epsd.name in data:
+                    epsd.animaunt_link = data[epsd.name]['animaunt_link']
+                    epsd.findanime_link = data[epsd.name]['findanime_link']
+                    epsd.anime_365_link = data[epsd.name]['anime_365_link']
+                    epsd.path = data[epsd.name]['path']
+                    flag = True
+                else:
+                    while not flag:
+                        uploads_toplvl(master, epsd)
+                        data = update_or_get_data(get=True)
+                        try:
+                            epsd.animaunt_link = data[epsd.name]['animaunt_link']
+                            flag = True
+                        except KeyError:
+                            pass
+                anime_list.append(epsd)
+        pb = master.nametowidget('links_list_frame.pb')
+        pb.config(maximum=(len(anime_list) * 2))
+        for anime in anime_list:
+            anime.get_link()
         text = master.nametowidget('links_list_frame.findanime_links')
-        text.config(state=tk.NORMAL)
-        text.insert(tk.END, f'{link}\n')
-        text.config(state=tk.DISABLED)
-        pb.step(1)
-    # flag = False
-    # while not flag:
-    #     try:
-    #         config = get_config()
-    #         if config['PATHS']['anime_path'] != '':
-    #             folder = config['PATHS']['anime_path']
-    #             flag = True
-    #         else:
-    #             path_choice(master)
-    #     except KeyError:
-    #         path_choice(master)
-    for anime in anime_list:
-        # found_folder = find_single_folder(folder, anime.name)
-        if anime.path and anime.file:
-            file_path = find_file(anime.path, anime.file)
-            link = anime365(anime, file_path)
-            text = master.nametowidget('links_list_frame.anime_365_links')
+        for anime in anime_list:
+            link = findanime(anime, 'anime')
             text.config(state=tk.NORMAL)
             text.insert(tk.END, f'{link}\n')
-        else:
-            text.config(state=tk.NORMAL)
-            text.insert(tk.END, 'Нет пути или файла\n')
-        text.config(state=tk.DISABLED)
-        pb.step(1)
-    upload_bttn.config(state=tk.NORMAL)
-    pb['value'] = 0
+            text.config(state=tk.DISABLED)
+            pb.step(1)
+        text = master.nametowidget('links_list_frame.anime_365_links')
+        for anime in anime_list:
+            if anime.path:
+                file_path = find_file(anime.path, anime.file)
+                link = anime365(anime, file_path)
+                text.config(state=tk.NORMAL)
+                text.insert(tk.END, f'{link}\n')
+            else:
+                text.config(state=tk.NORMAL)
+                text.insert(tk.END, 'Не указан путь к тайтлу\n')
+            text.config(state=tk.DISABLED)
+            pb.step(1)
+        upload_bttn.config(state=tk.NORMAL)
+        pb['value'] = 0
+    except Exception:
+        upload_bttn.config(state=tk.NORMAL)
 
 
 if __name__ == '__main__':
