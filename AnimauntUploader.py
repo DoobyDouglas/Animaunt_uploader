@@ -12,7 +12,7 @@ from config import get_config
 
 
 NAME = 'AnimauntUploader'
-VERSION = 0.06
+VERSION = 0.07
 
 
 def on_upload_bttn(
