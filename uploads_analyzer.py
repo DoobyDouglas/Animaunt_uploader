@@ -18,12 +18,16 @@ class Anime:
             animaunt_link=None,
             findanime_link=None,
             anime_365_link=None,
+            path=None,
             ) -> None:
         self.name = name
         self.number = number
         self.animaunt_link = animaunt_link
         self.findanime_link = findanime_link
         self.anime_365_link = anime_365_link
+        self.path = path
+        self.link = None
+        self.file = None
 
     def __str__(self) -> str:
         return self.name
@@ -42,7 +46,9 @@ class Anime:
                     By.XPATH,
                     './following-sibling::input'
                 ).get_attribute('value')
-                return code_value
+                self.link = code_value
+                self.file = code_value.split('/')[-1]
+                return
 
 
 def uploads_toplvl(
@@ -51,7 +57,7 @@ def uploads_toplvl(
         ):
     uplds = tk.Toplevel(master, name='uploads_toplvl')
     uplds.title('Uploads Data')
-    uplds.geometry('392x300+400+100')
+    uplds.geometry('392x400+400+100')
     uplds.resizable(False, False)
 
     title_name_lbl = ttk.Label(
@@ -79,9 +85,23 @@ def uploads_toplvl(
     anime_365_link_entry = ttk.Entry(uplds, width=60)
     anime_365_link_entry.grid(column=0, row=6, pady=6, padx=8)
 
+    add_folder_lbl = ttk.Label(uplds, text='Путь к папке с аниме')
+    add_folder_lbl.grid(column=0, row=7, pady=6, padx=6, sticky='n')
+
+    add_folder_bttn = ttk.Button(
+            uplds,
+            width=18,
+            name='add_folder_bttn',
+            text='Выбрать папку',
+        )
+    add_folder_bttn.grid(column=0, row=8, pady=5, padx=5)
+    add_folder_bttn.config(
+        command=lambda: path_choice(episode.name, master, add_folder_bttn)
+    )
+
     add_ttl_bttn = ttk.Button(
         uplds,
-        text='Добавить ссылки',
+        text='Добавить тайтл',
         width=18,
         command=lambda: update_or_get_data(
             episode.name,
@@ -91,7 +111,7 @@ def uploads_toplvl(
             master=master,
         ),
     )
-    add_ttl_bttn.grid(column=0, row=7, pady=12, padx=10)
+    add_ttl_bttn.grid(column=0, row=9, pady=12, padx=10)
 
     uplds.wm_attributes('-topmost', 1)
     uplds.wm_attributes('-topmost', 0)
@@ -115,6 +135,7 @@ def uploads_analyze(uploads: str, master: tk.Tk):
                 epsd.animaunt_link = data[epsd.name]['animaunt_link']
                 epsd.findanime_link = data[epsd.name]['findanime_link']
                 epsd.anime_365_link = data[epsd.name]['anime_365_link']
+                epsd.path = data[epsd.name]['path']
                 flag = True
             else:
                 while not flag:
@@ -124,13 +145,22 @@ def uploads_analyze(uploads: str, master: tk.Tk):
                         epsd.animaunt_link = data[epsd.name]['animaunt_link']
                         epsd.findanime_link = data[epsd.name]['findanime_link']
                         epsd.anime_365_link = data[epsd.name]['anime_365_link']
+                        epsd.path = data[epsd.name]['path']
                         flag = True
                     except KeyError:
                         pass
-            if flag:
-                anime_list.append(epsd)
+            anime_list.append(epsd)
     pb = master.nametowidget('links_list_frame.pb')
     pb.config(maximum=(len(anime_list) * 2))
+    for anime in anime_list:
+        anime.get_link()
+        # print(anime.name)
+        # print(anime.animaunt_link)
+        # print(anime.findanime_link)
+        # print(anime.anime_365_link)
+        # print(anime.path)
+        # print(anime.file)
+        # print(anime.link)
     for anime in anime_list:
         link = findanime(anime)
         text = master.nametowidget('links_list_frame.findanime_links')
@@ -138,24 +168,28 @@ def uploads_analyze(uploads: str, master: tk.Tk):
         text.insert(tk.END, f'{link}\n')
         text.config(state=tk.DISABLED)
         pb.step(1)
-    flag = False
-    while not flag:
-        try:
-            config = get_config()
-            if config['PATHS']['anime_path'] != '':
-                folder = config['PATHS']['anime_path']
-                flag = True
-            else:
-                path_choice(master)
-        except KeyError:
-            path_choice(master)
+    # flag = False
+    # while not flag:
+    #     try:
+    #         config = get_config()
+    #         if config['PATHS']['anime_path'] != '':
+    #             folder = config['PATHS']['anime_path']
+    #             flag = True
+    #         else:
+    #             path_choice(master)
+    #     except KeyError:
+    #         path_choice(master)
     for anime in anime_list:
-        found_folder = find_single_folder(folder, anime.name)
-        file_path = find_file(found_folder, anime.get_link().split('/')[-1])
-        link = anime365(anime, file_path)
-        text = master.nametowidget('links_list_frame.anime_365_links')
-        text.config(state=tk.NORMAL)
-        text.insert(tk.END, f'{link}\n')
+        # found_folder = find_single_folder(folder, anime.name)
+        if anime.path and anime.file:
+            file_path = find_file(anime.path, anime.file)
+            link = anime365(anime, file_path)
+            text = master.nametowidget('links_list_frame.anime_365_links')
+            text.config(state=tk.NORMAL)
+            text.insert(tk.END, f'{link}\n')
+        else:
+            text.config(state=tk.NORMAL)
+            text.insert(tk.END, 'Нет пути или файла\n')
         text.config(state=tk.DISABLED)
         pb.step(1)
     upload_bttn.config(state=tk.NORMAL)

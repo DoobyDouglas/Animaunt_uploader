@@ -12,7 +12,7 @@ from config import get_config
 
 
 NAME = 'AnimauntUploader'
-VERSION = 0.05
+VERSION = 0.07
 
 
 def on_upload_bttn(
@@ -60,6 +60,19 @@ anime_365_link_name_lbl.grid(column=0, row=6, pady=5, padx=5, sticky='w')
 anime_365_link_entry = ttk.Entry(add_ttl_frame)
 anime_365_link_entry.grid(column=0, row=7, pady=5, padx=5)
 
+add_folder_lbl = ttk.Label(add_ttl_frame, text='Путь к папке с аниме')
+add_folder_lbl.grid(column=0, row=8, pady=5, padx=5, sticky='w')
+
+
+add_folder_bttn = ttk.Button(
+    add_ttl_frame,
+    width=18,
+    name='add_folder_bttn',
+    command=lambda: path_choice(ttl_name_entry.get().strip(), master),
+    text='Выбрать папку'
+)
+add_folder_bttn.grid(column=0, row=9, pady=5, padx=5)
+
 add_ttl_bttn = ttk.Button(
     add_ttl_frame,
     text='Добавить тайтл',
@@ -72,32 +85,12 @@ add_ttl_bttn = ttk.Button(
         master=master,
     ),
 )
-add_ttl_bttn.grid(column=0, row=8, pady=10, padx=5)
+add_ttl_bttn.grid(column=0, row=10, pady=38, padx=5)
 
-add_folder_frame = ttk.Frame(master, name='add_folder_frame')
-add_folder_frame.place(anchor='nw', y=355, x=10)
+# add_folder_frame = ttk.Frame(master, name='add_folder_frame')
+# add_folder_frame.place(anchor='nw', y=355, x=10)
 
-add_folder_lbl = ttk.Label(add_folder_frame, text='Путь к папке с аниме')
-add_folder_lbl.grid(column=0, row=0, pady=5, padx=5, sticky='w')
 
-kwargs = {}
-try:
-    if config['PATHS']['anime_path'] != '':
-        kwargs['bootstyle'] = 'success'
-        kwargs['text'] = 'Папка выбрана'
-    else:
-        kwargs['text'] = 'Выбрать папку'
-except KeyError:
-    kwargs['text'] = 'Выбрать папку'
-
-add_folder_bttn = ttk.Button(
-    add_folder_frame,
-    width=18,
-    name='add_folder_bttn',
-    command=lambda: path_choice(master),
-    **kwargs,
-)
-add_folder_bttn.grid(column=0, row=1, pady=5, padx=5)
 
 upload_list_frame = ttk.Frame(master, name='upload_list_frame')
 upload_list_frame.pack(side='left', anchor='ne', padx=15, pady=10)

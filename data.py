@@ -7,13 +7,26 @@ from tkinter import filedialog
 from config import write_config
 
 
-def path_choice(master: tkinter.Tk = None):
+PATHS = {}
+
+
+def path_choice(
+        title: str,
+        master: tkinter.Tk = None,
+        upload_bttn=None,
+        ):
+    if title == '':
+        messagebox.showinfo('Нет названия', 'Введите название')
+        return
     path = filedialog.askdirectory(title='Выберите папку с аниме')
     if path:
-        write_config('anime_path', path)
-        bttn = master.nametowidget('add_folder_frame.add_folder_bttn')
+        bttn = master.nametowidget('add_ttl_frame.add_folder_bttn')
         bttn['text'] = 'Папка выбрана'
         bttn.config(bootstyle='success')
+        PATHS[title] = path
+        if upload_bttn:
+            upload_bttn['text'] = 'Папка выбрана'
+            upload_bttn.config(bootstyle='success')
     else:
         messagebox.showinfo('Ошибка', 'Папка не выбрана')
         return
@@ -50,6 +63,8 @@ def update_or_get_data(
             'findanime_link': findanime_link,
             'anime_365_link': anime_365_link,
         }
+        if name in PATHS:
+            data[name]['path'] = PATHS[name]
     with open('anime.json', 'w', encoding='utf-8') as json_file:
         json.dump(data, json_file)
     if not get and master:
@@ -57,6 +72,9 @@ def update_or_get_data(
         master.nametowidget('add_ttl_frame.!entry2').delete(0, 'end')
         master.nametowidget('add_ttl_frame.!entry3').delete(0, 'end')
         master.nametowidget('add_ttl_frame.!entry4').delete(0, 'end')
+        bttn = master.nametowidget('add_ttl_frame.add_folder_bttn')
+        bttn.config(text='Выбрать папку')
+        bttn.config(bootstyle='primary')
         try:
             master.nametowidget('.uploads_toplvl').destroy()
         except KeyError:
