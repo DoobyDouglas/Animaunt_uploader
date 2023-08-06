@@ -20,19 +20,18 @@ def get_options():
     return options
 
 
-def findanime(anime, key):
-    if not anime.findanime_link:
-        return 'Нет на Findanime'
+def findanime(episode, key):
     if key == 'anime':
-        code_value = anime.link
-    else:
-        code_value = ''
+        if not episode.findanime_link:
+            return 'Нет на Findanime'
+        url = episode.findanime_link
+    elif key == 'dorama':
+        if not episode.doramatv_link:
+            return 'Нет на Doramatv'
+        url = episode.doramatv_link
+    code_value = episode.link
     options = get_options()
-    entry_number = anime.number
-    if key == 'anime':
-        url = anime.findanime_link
-    else:
-        url = ''
+    entry_number = episode.number
     driver = webdriver.Chrome(options=options)
     driver.get(url)
     found_episode_element = None

@@ -63,14 +63,42 @@ class Dorama:
         self.name = name
         self.number = number
         self.malfurik_link = malfurik_link
+        self.doramatv_link = None
+        self.link = None
 
     def __str__(self) -> str:
         return self.name
 
+    def get_link(self):
+        options = get_options()
+        entry_number = self.number
+        url_malf = self.malfurik_link
+        driver = webdriver.Chrome(options=options)
+        driver.get(url_malf)
+        edit_li = driver.find_element(By.ID, 'wp-admin-bar-edit')
+        edit_link = edit_li.find_element(By.TAG_NAME, 'a').get_attribute('href')
+        driver.get(edit_link)
+        series_elements = driver.find_elements(By.CLASS_NAME, 'rwmb-group-clone')
+        series_info = []
+        for series_element in series_elements:
+            title_element = series_element.find_element(By.CLASS_NAME, 'rwmb-text')
+            series_title = title_element.get_attribute('value')
+            video_elemment = series_element.find_elements(By.TAG_NAME, 'input')[1]
+            video_link = video_elemment.get_attribute('value')
+            if series_title and video_link and entry_number in series_title:
+                found_seria = video_link
+                series_info.append({
+                    'series_title': series_title,
+                    'video_link': video_link
+                })
+                self.link = found_seria
+                return
+
 
 def uploads_toplvl(
         master: tk.Tk,
-        episode: Anime,
+        episode: Anime or Dorama,
+        key: str,
         ):
     uplds = tk.Toplevel(master, name='uploads_toplvl')
     uplds.title('Uploads Data')
@@ -126,6 +154,7 @@ def uploads_toplvl(
             findanime_link_entry.get().strip(),
             anime_365_link_entry.get().strip(),
             master=master,
+            key=key,
         ),
     )
     add_ttl_bttn.grid(column=0, row=9, pady=12, padx=10)
@@ -149,7 +178,7 @@ def uploads_analyze(uploads: str, master: tk.Tk, key: str):
         text.config(state=tk.NORMAL)
         text.delete('1.0', tk.END)
         text.config(state=tk.DISABLED)
-    anime_list = []
+    episodes = []
     data = update_or_get_data(get=True)
 
     try:
@@ -157,47 +186,65 @@ def uploads_analyze(uploads: str, master: tk.Tk, key: str):
             number = line.split()[-1]
             if number.isdigit():
                 name = ' '.join(line.split()[:-1])
-                epsd = Anime(name, number)
-                flag = False
-                if epsd.name in data:
-                    epsd.animaunt_link = data[epsd.name]['animaunt_link']
-                    epsd.findanime_link = data[epsd.name]['findanime_link']
-                    epsd.anime_365_link = data[epsd.name]['anime_365_link']
-                    epsd.path = data[epsd.name]['path']
-                    flag = True
-                else:
-                    while not flag:
-                        uploads_toplvl(master, epsd)
-                        data = update_or_get_data(get=True)
-                        try:
-                            epsd.animaunt_link = data[epsd.name]['animaunt_link']
-                            flag = True
-                        except KeyError:
-                            pass
-                anime_list.append(epsd)
+                if key == 'anime':
+                    epsd = Anime(name, number)
+                    flag = False
+                    if epsd.name in data:
+                        epsd.animaunt_link = data[epsd.name]['animaunt_link']
+                        epsd.findanime_link = data[epsd.name]['findanime_link']
+                        epsd.anime_365_link = data[epsd.name]['anime_365_link']
+                        epsd.path = data[epsd.name]['path']
+                        flag = True
+                    else:
+                        while not flag:
+                            uploads_toplvl(master, epsd, key)
+                            data = update_or_get_data(get=True)
+                            try:
+                                epsd.animaunt_link = data[epsd.name]['animaunt_link']
+                                flag = True
+                            except KeyError:
+                                pass
+                elif key == 'dorama':
+                    epsd = Dorama(name, number)
+                    flag = False
+                    if epsd.name in data:
+                        epsd.malfurik_link = data[epsd.name]['malfurik_link']
+                        epsd.doramatv_link = data[epsd.name]['doramatv_link']
+                        flag = True
+                    else:
+                        while not flag:
+                            uploads_toplvl(master, epsd, key)
+                            data = update_or_get_data(get=True)
+                            try:
+                                epsd.malfurik_ = data[epsd.name]['malfurik_link']
+                                flag = True
+                            except KeyError:
+                                pass
+                episodes.append(epsd)
         pb = master.nametowidget('links_list_frame.pb')
-        pb.config(maximum=(len(anime_list) * 2))
-        for anime in anime_list:
-            anime.get_link()
+        pb.config(maximum=(len(episodes) * 2))
+        for episode in episodes:
+            episode.get_link()
         text = master.nametowidget('links_list_frame.findanime_links')
-        for anime in anime_list:
-            link = findanime(anime, key)
+        for episode in episodes:
+            link = findanime(episode, key)
             text.config(state=tk.NORMAL)
             text.insert(tk.END, f'{link}\n')
             text.config(state=tk.DISABLED)
             pb.step(1)
         text = master.nametowidget('links_list_frame.anime_365_links')
-        for anime in anime_list:
-            if anime.path:
-                file_path = find_file(anime.path, anime.file)
-                link = anime365(anime, file_path)
-                text.config(state=tk.NORMAL)
-                text.insert(tk.END, f'{link}\n')
-            else:
-                text.config(state=tk.NORMAL)
-                text.insert(tk.END, 'Не указан путь к тайтлу\n')
-            text.config(state=tk.DISABLED)
-            pb.step(1)
+        if key != 'dorama':
+            for anime in episodes:
+                if anime.path:
+                    file_path = find_file(anime.path, anime.file)
+                    link = anime365(anime, file_path)
+                    text.config(state=tk.NORMAL)
+                    text.insert(tk.END, f'{link}\n')
+                else:
+                    text.config(state=tk.NORMAL)
+                    text.insert(tk.END, 'Не указан путь к тайтлу\n')
+                text.config(state=tk.DISABLED)
+                pb.step(1)
         upload_bttn.config(state=tk.NORMAL)
         pb['value'] = 0
     except Exception:
