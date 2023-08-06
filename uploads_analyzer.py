@@ -216,7 +216,7 @@ def uploads_analyze(uploads: str, master: tk.Tk, key: str):
                             uploads_toplvl(master, epsd, key)
                             data = update_or_get_data(get=True)
                             try:
-                                epsd.malfurik_ = data[epsd.name]['malfurik_link']
+                                epsd.malfurik_link = data[epsd.name]['malfurik_link']
                                 flag = True
                             except KeyError:
                                 pass

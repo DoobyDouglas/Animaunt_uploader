@@ -16,7 +16,7 @@ CHROME_PATH = (
 
 def get_options():
     options = webdriver.ChromeOptions()
-    #options.add_argument("--headless")
+    options.add_argument("--headless")
     options.add_argument(CHROME_PATH)
     return options
 
