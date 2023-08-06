@@ -32,10 +32,6 @@ def findanime(episode, key):
     code_value = episode.link
     options = get_options()
     entry_number = episode.number
-    if key == 'anime':
-        url = episode.findanime_link
-    else:
-        url = episode.doramatv_link
     driver = webdriver.Chrome(options=options)
     driver.get(url)
     found_episode_element = None

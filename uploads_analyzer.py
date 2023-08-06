@@ -92,7 +92,6 @@ class Dorama:
                     'video_link': video_link
                 })
                 self.link = found_seria
-                print(found_seria)
                 return
 
 
@@ -209,15 +208,15 @@ def uploads_analyze(uploads: str, master: tk.Tk, key: str):
                     epsd = Dorama(name, number)
                     flag = False
                     if epsd.name in data:
-                        epsd.animaunt_link = data[epsd.name]['malfurik_link']
-                        epsd.findanime_link = data[epsd.name]['doramatv_link']
+                        epsd.malfurik_link = data[epsd.name]['malfurik_link']
+                        epsd.doramatv_link = data[epsd.name]['doramatv_link']
                         flag = True
                     else:
                         while not flag:
                             uploads_toplvl(master, epsd, key)
                             data = update_or_get_data(get=True)
                             try:
-                                epsd.animaunt_link = data[epsd.name]['malfurik_link']
+                                epsd.malfurik_ = data[epsd.name]['malfurik_link']
                                 flag = True
                             except KeyError:
                                 pass
@@ -225,10 +224,7 @@ def uploads_analyze(uploads: str, master: tk.Tk, key: str):
         pb = master.nametowidget('links_list_frame.pb')
         pb.config(maximum=(len(episodes) * 2))
         for episode in episodes:
-            print(episode.name)
-            print(episode.number)
             episode.get_link()
-            print(episode.link)
         text = master.nametowidget('links_list_frame.findanime_links')
         for episode in episodes:
             link = findanime(episode, key)
