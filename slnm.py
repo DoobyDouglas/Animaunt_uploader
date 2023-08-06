@@ -77,16 +77,18 @@ def findanime(episode, key):
         translation_select.select_by_visible_text("Озвучка")
 
     if key == 'dorama':
-        select_element = driver.find_element(By.CLASS_NAME, "selectize-input.items.not-full.has-options.has-items")
-        options = select_element.find_element(By.CLASS_NAME, "item").text
-        if "AniMaunt (Переводчик)" in options:
-            print('Переводчик указан')
-        '''else:
+        try:
+            select_element = driver.find_element(By.CLASS_NAME, "selectize-input.items.not-full.has-options.has-items")
+            options = select_element.find_element(By.CLASS_NAME, "item").text
+            if "AniMaunt (Переводчик)" in options:
+                print('Переводчик указан')
+        except Exception as e:
             input_name = driver.find_element(By.CSS_SELECTOR, '.selectize-input.items.not-full.has-options input')
             input_name.send_keys('Animaunt')
             time.sleep(2)  # Время ожидания в секундах, может потребоваться настройка
             input_name.send_keys(Keys.DOWN)
-            input_name.send_keys(Keys.ENTER)'''
+            input_name.send_keys(Keys.ENTER)
+
     elif key == 'anime':
         div_with_select = driver.find_element(By.XPATH, "//div[select[@placeholder='Начните писать...']]")
         new_html = """
