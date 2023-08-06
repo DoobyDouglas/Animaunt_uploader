@@ -3,6 +3,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support import expected_conditions as EC
 import re
 import time
@@ -15,7 +16,7 @@ CHROME_PATH = (
 
 def get_options():
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
+    #options.add_argument("--headless")
     options.add_argument(CHROME_PATH)
     return options
 
@@ -75,10 +76,18 @@ def findanime(episode, key):
     else:
         translation_select.select_by_visible_text("Озвучка")
 
-    select_element = driver.find_element(By.NAME, "personAndType").text
-    if "AniMaunt (Переводчик)" in select_element:
-        pass
-    else:
+    if key == 'dorama':
+        select_element = driver.find_element(By.CLASS_NAME, "selectize-input.items.not-full.has-options.has-items")
+        options = select_element.find_element(By.CLASS_NAME, "item").text
+        if "AniMaunt (Переводчик)" in options:
+            print('Переводчик указан')
+        '''else:
+            input_name = driver.find_element(By.CSS_SELECTOR, '.selectize-input.items.not-full.has-options input')
+            input_name.send_keys('Animaunt')
+            time.sleep(2)  # Время ожидания в секундах, может потребоваться настройка
+            input_name.send_keys(Keys.DOWN)
+            input_name.send_keys(Keys.ENTER)'''
+    elif key == 'anime':
         div_with_select = driver.find_element(By.XPATH, "//div[select[@placeholder='Начните писать...']]")
         new_html = """
             <select name="personAndType" class="select-role-null form-control selectized" multiple="multiple" placeholder="Начните писать..." style="display: none;" tabindex="-1">
@@ -105,6 +114,7 @@ def findanime(episode, key):
             </script>
         """
         driver.execute_script("arguments[0].innerHTML = arguments[1];", div_with_select, new_html)
+    time.sleep(1)
     driver.find_element(By.CLASS_NAME, 'btn-success').click()
     return found_episode_link
 
