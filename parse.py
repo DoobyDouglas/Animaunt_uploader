@@ -1,12 +1,15 @@
-import getpass
+from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support import expected_conditions as EC
+from models import Anime, Dorama
+from typing import List
+import getpass
 import re
 import time
+
 
 USERNAME = getpass.getuser()
 CHROME_PATH = (
@@ -14,14 +17,59 @@ CHROME_PATH = (
 )
 
 
-def get_options():
+def get_options() -> webdriver.ChromeOptions:
     options = webdriver.ChromeOptions()
     options.add_argument("--headless")
     options.add_argument(CHROME_PATH)
     return options
 
 
-def findanime(episode, key):
+def parse_animaunt(driver: webdriver.Chrome, episode: Anime) -> None:
+    seria = f'{episode.number} серия'
+    link_animaunt = episode.animaunt_link
+    pattern = r"https://animaunt\.(org|tv)/(\d+)-"
+    match = re.search(pattern, link_animaunt)
+    id_animaunt = match.group(2)
+    driver.get(f'https://animaunt.org/私は独身です.php?mod=editnews&action=editnews&id={id_animaunt}')
+    tabplayer1 = driver.find_element(By.ID, "tabplayer1")
+    divs = tabplayer1.find_elements(By.CLASS_NAME, 'col-sm-12')
+    for div in divs:
+        input_element = div.find_element(By.TAG_NAME, 'input')
+        if input_element.get_attribute('value') == seria:
+            code_value = input_element.find_element(
+                By.XPATH,
+                './following-sibling::input'
+            ).get_attribute('value')
+            episode.link = code_value
+            episode.file = code_value.split('/')[-1]
+
+
+def parse_malfurik(driver: webdriver.Chrome, episodes: List[Dorama]):
+    for episode in episodes:
+        entry_number = episode.number
+        url_malf = episode.malfurik_link
+        driver.get(url_malf)
+        edit_li = driver.find_element(By.ID, 'wp-admin-bar-edit')
+        edit_link = edit_li.find_element(By.TAG_NAME, 'a').get_attribute('href')
+        driver.get(edit_link)
+        series_elements = driver.find_elements(By.CLASS_NAME, 'rwmb-group-clone')
+        series_info = []
+        for series_element in series_elements:
+            title_element = series_element.find_element(By.CLASS_NAME, 'rwmb-text')
+            series_title = title_element.get_attribute('value')
+            video_elemment = series_element.find_elements(By.TAG_NAME, 'input')[1]
+            video_link = video_elemment.get_attribute('value')
+            if series_title and video_link and f'{entry_number} серия' == series_title.lower():
+                found_seria = video_link
+                series_info.append({
+                    'series_title': series_title,
+                    'video_link': video_link
+                })
+                episode.link = found_seria
+                break
+
+
+def findanime(driver: webdriver.Chrome, episode: Anime or Dorama, key: str):
     if key == 'anime':
         if not episode.findanime_link:
             return 'Нет на Findanime'
@@ -119,10 +167,10 @@ def findanime(episode, key):
     time.sleep(1)
     button_post = driver.find_element(By.CLASS_NAME, 'btn-success') #.click()
     button_post.send_keys(Keys.ENTER)
-    return found_episode_link
+    episode.resilt_link = found_episode_link
 
 
-def anime365(anime, file_path):
+def anime365(driver: webdriver.Chrome, anime: Anime, file_path: str):
     if not anime.anime_365_link:
         return 'Нет на Аnime 365'
     if not anime.path:

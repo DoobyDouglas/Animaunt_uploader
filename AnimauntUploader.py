@@ -6,12 +6,12 @@ import tkinter as tk
 from ttkbootstrap import Style
 import ttkbootstrap as ttk
 from data import update_or_get_data, path_choice
-from uploads_analyzer import uploads_analyze
+from uploads import upload
 from threading import Thread
 
 
 NAME = 'AnimauntUploader'
-VERSION = 0.09
+VERSION = 0.10
 
 
 def on_upload_bttn(
@@ -19,7 +19,7 @@ def on_upload_bttn(
         master: tk.Tk,
         key: str,
         ):
-    thread = Thread(target=uploads_analyze, args=(uploads, master, key))
+    thread = Thread(target=upload, args=(master, uploads, key))
     thread.start()
 
 
@@ -90,7 +90,7 @@ add_ttl_bttn = ttk.Button(
         key=key_var.get(),
     ),
 )
-add_ttl_bttn.grid(column=0, row=10, pady=38, padx=5)
+add_ttl_bttn.grid(column=0, row=10, pady=9, padx=5)
 
 upload_list_frame = ttk.Frame(master, name='upload_list_frame')
 upload_list_frame.pack(side='left', anchor='ne', padx=15, pady=10)

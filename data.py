@@ -1,11 +1,9 @@
-import json
-import os
-from typing import Dict
-import tkinter
 from tkinter import messagebox
 from tkinter import filedialog
-from config import write_config
-
+from typing import Dict
+import tkinter
+import json
+import os
 
 PATHS = {}
 
@@ -74,6 +72,9 @@ def update_or_get_data(
                 'malfurik_link': animaunt_link,
                 'doramatv_link': findanime_link,
             }
+    else:
+        pass
+        # написать обработку
     with open('anime.json', 'w', encoding='utf-8') as json_file:
         json.dump(data, json_file)
     if not get and master:
