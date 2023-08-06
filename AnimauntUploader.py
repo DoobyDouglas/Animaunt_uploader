@@ -17,8 +17,9 @@ VERSION = 0.09
 def on_upload_bttn(
         uploads: str,
         master: tk.Tk,
+        key: str,
         ):
-    thread = Thread(target=uploads_analyze, args=(uploads, master))
+    thread = Thread(target=uploads_analyze, args=(uploads, master, key))
     thread.start()
 
 
@@ -39,13 +40,19 @@ ttl_name_lbl.grid(column=0, row=0, pady=5, padx=5, sticky='w')
 ttl_name_entry = ttk.Entry(add_ttl_frame)
 ttl_name_entry.grid(column=0, row=1, pady=5, padx=5)
 
-animaunt_link_name_lbl = ttk.Label(add_ttl_frame, text='Ссылка на Animaunt')
+animaunt_link_name_lbl = ttk.Label(
+    add_ttl_frame,
+    text='Ссылка на \nAnimaunt / Malfurik',
+)
 animaunt_link_name_lbl.grid(column=0, row=2, pady=5, padx=5, sticky='w')
 
 animaunt_link_entry = ttk.Entry(add_ttl_frame)
 animaunt_link_entry.grid(column=0, row=3, pady=5, padx=5)
 
-findanime_link_name_lbl = ttk.Label(add_ttl_frame, text='Ссылка на Findanime')
+findanime_link_name_lbl = ttk.Label(
+    add_ttl_frame,
+    text='Ссылка на \nFindanime / Doramatv',
+)
 findanime_link_name_lbl.grid(column=0, row=4, pady=5, padx=5, sticky='w')
 
 findanime_link_entry = ttk.Entry(add_ttl_frame)
@@ -80,6 +87,7 @@ add_ttl_bttn = ttk.Button(
         findanime_link_entry.get().strip(),
         anime_365_link_entry.get().strip(),
         master=master,
+        key=key_var.get(),
     ),
 )
 add_ttl_bttn.grid(column=0, row=10, pady=38, padx=5)
@@ -101,6 +109,7 @@ upload_bttn = ttk.Button(
     command=lambda: on_upload_bttn(
         uploads.get('1.0', 'end'),
         master,
+        key_var.get(),
     ),
 )
 upload_bttn.grid(column=0, row=2, pady=10, padx=5, sticky='se')
@@ -110,7 +119,7 @@ links_list_frame.pack(side='left', anchor='ne', padx=10, pady=10)
 
 findanime_list_lbl = ttk.Label(
     links_list_frame,
-    text='Список загрузок на Findanime',
+    text='Список загрузок на Findanime / Doramatv',
 )
 findanime_list_lbl.grid(column=0, row=0, pady=5, padx=5, sticky='w')
 
@@ -146,6 +155,13 @@ anime_365_links = ttk.Text(
 )
 anime_365_links.grid(column=1, row=1, pady=5, padx=30)
 
+key_var = ttk.StringVar(master, name='uploads_key', value='anime')
+
+anime_rbttn = ttk.Radiobutton(upload_list_frame, text='Anime', variable=key_var, value='anime')
+anime_rbttn.grid(column=0, row=2, pady=15, padx=5, sticky='sw')
+
+dorama_rbttn = ttk.Radiobutton(upload_list_frame, text='Dorama', variable=key_var, value='dorama')
+dorama_rbttn.grid(column=0, row=2, pady=15, padx=80, sticky='sw')
 
 if __name__ == '__main__':
     master.mainloop()
