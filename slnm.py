@@ -115,7 +115,8 @@ def findanime(episode, key):
         """
         driver.execute_script("arguments[0].innerHTML = arguments[1];", div_with_select, new_html)
     time.sleep(1)
-    driver.find_element(By.CLASS_NAME, 'btn-success').click()
+    button_post = driver.find_element(By.CLASS_NAME, 'btn-success') #.click()
+    button_post.send_keys(Keys.ENTER)
     return found_episode_link
 
 

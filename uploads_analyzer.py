@@ -247,7 +247,8 @@ def uploads_analyze(uploads: str, master: tk.Tk, key: str):
                 pb.step(1)
         upload_bttn.config(state=tk.NORMAL)
         pb['value'] = 0
-    except Exception:
+    except Exception as e:
+        print(e)
         upload_bttn.config(state=tk.NORMAL)
 
 
