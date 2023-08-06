@@ -85,7 +85,7 @@ class Dorama:
             series_title = title_element.get_attribute('value')
             video_elemment = series_element.find_elements(By.TAG_NAME, 'input')[1]
             video_link = video_elemment.get_attribute('value')
-            if series_title and video_link and entry_number in series_title:
+            if series_title and video_link and f'{entry_number} серия' == series_title.lower():
                 found_seria = video_link
                 series_info.append({
                     'series_title': series_title,
