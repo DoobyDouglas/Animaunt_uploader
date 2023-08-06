@@ -39,6 +39,7 @@ def update_or_get_data(
         anime_365_link: str = None,
         get: bool = False,
         master: tkinter.Tk = None,
+        key: str = None,
         ) -> Dict or None:
     if not os.path.exists('anime.json'):
         with open('anime.json', 'w', encoding='utf-8') as json_file:
@@ -54,19 +55,25 @@ def update_or_get_data(
     if not animaunt_link:
         messagebox.showinfo(
             'Нет ссылки',
-            'Введите ссылку на редактирование Animaunt'
+            'Введите ссылку на Animaunt / Malfurik'
         )
         return
     if name not in data:
-        data[name] = {
-            'animaunt_link': animaunt_link,
-            'findanime_link': findanime_link,
-            'anime_365_link': anime_365_link,
-        }
-        if name in PATHS:
-            data[name]['path'] = PATHS[name]
-        else:
-            data[name]['path'] = None
+        if key == 'anime':
+            data[name] = {
+                'animaunt_link': animaunt_link,
+                'findanime_link': findanime_link,
+                'anime_365_link': anime_365_link,
+            }
+            if name in PATHS:
+                data[name]['path'] = PATHS[name]
+            else:
+                data[name]['path'] = None
+        elif key == 'dorama':
+            data[name] = {
+                'malfurik_link': animaunt_link,
+                'doramatv_link': findanime_link,
+            }
     with open('anime.json', 'w', encoding='utf-8') as json_file:
         json.dump(data, json_file)
     if not get and master:

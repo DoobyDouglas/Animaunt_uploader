@@ -53,6 +53,21 @@ class Anime:
                 return
 
 
+class Dorama:
+    def __init__(
+            self,
+            name,
+            number,
+            malfurik_link=None,
+            ) -> None:
+        self.name = name
+        self.number = number
+        self.malfurik_link = malfurik_link
+
+    def __str__(self) -> str:
+        return self.name
+
+
 def uploads_toplvl(
         master: tk.Tk,
         episode: Anime,
@@ -122,7 +137,7 @@ def uploads_toplvl(
     uplds.wait_window()
 
 
-def uploads_analyze(uploads: str, master: tk.Tk):
+def uploads_analyze(uploads: str, master: tk.Tk, key: str):
     upload_bttn = master.nametowidget('upload_list_frame.upload_bttn')
     upload_bttn.config(state=tk.DISABLED)
     txt_widget_names = [
@@ -166,7 +181,7 @@ def uploads_analyze(uploads: str, master: tk.Tk):
             anime.get_link()
         text = master.nametowidget('links_list_frame.findanime_links')
         for anime in anime_list:
-            link = findanime(anime, 'anime')
+            link = findanime(anime, key)
             text.config(state=tk.NORMAL)
             text.insert(tk.END, f'{link}\n')
             text.config(state=tk.DISABLED)
