@@ -1,15 +1,11 @@
 from data import update_or_get_data, path_choice
 from selenium import webdriver
-from selenium.webdriver.common.by import By
 from parse import get_options, findanime, anime365
 from searchfolder import find_file
 import tkinter as tk
 import ttkbootstrap as tb
-import re
-from datetime import datetime as dt
 from models import Anime, Dorama
 from parse import parse_animaunt, parse_malfurik
-from models import Anime, Dorama
 from typing import List
 
 
