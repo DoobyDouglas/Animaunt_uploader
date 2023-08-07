@@ -42,31 +42,31 @@ def parse_animaunt(driver: webdriver.Chrome, episode: Anime) -> None:
             ).get_attribute('value')
             episode.link = code_value
             episode.file = code_value.split('/')[-1]
+            break
 
 
-def parse_malfurik(driver: webdriver.Chrome, episodes: List[Dorama]):
-    for episode in episodes:
-        entry_number = episode.number
-        url_malf = episode.malfurik_link
-        driver.get(url_malf)
-        edit_li = driver.find_element(By.ID, 'wp-admin-bar-edit')
-        edit_link = edit_li.find_element(By.TAG_NAME, 'a').get_attribute('href')
-        driver.get(edit_link)
-        series_elements = driver.find_elements(By.CLASS_NAME, 'rwmb-group-clone')
-        series_info = []
-        for series_element in series_elements:
-            title_element = series_element.find_element(By.CLASS_NAME, 'rwmb-text')
-            series_title = title_element.get_attribute('value')
-            video_elemment = series_element.find_elements(By.TAG_NAME, 'input')[1]
-            video_link = video_elemment.get_attribute('value')
-            if series_title and video_link and f'{entry_number} серия' == series_title.lower():
-                found_seria = video_link
-                series_info.append({
-                    'series_title': series_title,
-                    'video_link': video_link
-                })
-                episode.link = found_seria
-                break
+def parse_malfurik(driver: webdriver.Chrome, episode: Dorama):
+    entry_number = episode.number
+    url_malf = episode.malfurik_link
+    driver.get(url_malf)
+    edit_li = driver.find_element(By.ID, 'wp-admin-bar-edit')
+    edit_link = edit_li.find_element(By.TAG_NAME, 'a').get_attribute('href')
+    driver.get(edit_link)
+    series_elements = driver.find_elements(By.CLASS_NAME, 'rwmb-group-clone')
+    series_info = []
+    for series_element in series_elements:
+        title_element = series_element.find_element(By.CLASS_NAME, 'rwmb-text')
+        series_title = title_element.get_attribute('value')
+        video_elemment = series_element.find_elements(By.TAG_NAME, 'input')[1]
+        video_link = video_elemment.get_attribute('value')
+        if series_title and video_link and f'{entry_number} серия' == series_title.lower():
+            found_seria = video_link
+            series_info.append({
+                'series_title': series_title,
+                'video_link': video_link
+            })
+            episode.link = found_seria
+            break
 
 
 def findanime(driver: webdriver.Chrome, episode: Anime or Dorama, key: str):
