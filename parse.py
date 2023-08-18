@@ -31,7 +31,9 @@ def parse_animaunt(driver: webdriver.Chrome, episode: Anime) -> None:
     match = re.search(pattern, link_animaunt)
     id_animaunt = match.group(2)
     driver.get(f'https://animaunt.org/私は独身です.php?mod=editnews&action=editnews&id={id_animaunt}')
-    tabplayer1 = driver.find_element(By.ID, "tabplayer1")
+    tabplayer1 = WebDriverWait(driver, 100).until(
+        EC.presence_of_element_located((By.ID, "tabplayer1"))
+    )
     divs = tabplayer1.find_elements(By.CLASS_NAME, 'col-sm-12')
     for div in divs:
         input_element = div.find_element(By.TAG_NAME, 'input')
