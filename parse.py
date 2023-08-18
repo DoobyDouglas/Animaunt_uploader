@@ -5,7 +5,6 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from models import Anime, Dorama
-from typing import List
 import getpass
 import re
 import time
@@ -19,7 +18,7 @@ CHROME_PATH = (
 
 def get_options() -> webdriver.ChromeOptions:
     options = webdriver.ChromeOptions()
-    options.add_argument("--headless")
+    # options.add_argument("--headless")
     options.add_argument(CHROME_PATH)
     return options
 
@@ -31,7 +30,9 @@ def parse_animaunt(driver: webdriver.Chrome, episode: Anime) -> None:
     match = re.search(pattern, link_animaunt)
     id_animaunt = match.group(2)
     driver.get(f'https://animaunt.org/私は独身です.php?mod=editnews&action=editnews&id={id_animaunt}')
-    tabplayer1 = driver.find_element(By.ID, "tabplayer1")
+    tabplayer1 = WebDriverWait(driver, 100).until(
+        EC.presence_of_element_located((By.ID, "tabplayer1"))
+    )
     divs = tabplayer1.find_elements(By.CLASS_NAME, 'col-sm-12')
     for div in divs:
         input_element = div.find_element(By.TAG_NAME, 'input')
@@ -79,9 +80,7 @@ def findanime(driver: webdriver.Chrome, episode: Anime or Dorama, key: str):
             return 'Нет на Doramatv'
         url = episode.doramatv_link
     code_value = episode.link
-    options = get_options()
     entry_number = episode.number
-    driver = webdriver.Chrome(options=options)
     driver.get(url)
     found_episode_element = None
     exclude_list = []
@@ -177,8 +176,6 @@ def anime365(driver: webdriver.Chrome, anime: Anime, file_path: str):
         return 'Не указан путь к тайтлу'
     entry_number = anime.number
     link_365 = anime.anime_365_link
-    options = get_options()
-    driver = webdriver.Chrome(options=options)
     driver.get(link_365)
     select_seria = driver.find_element(By.XPATH, f"//a[contains(text(), '{entry_number} серия')]")
     link_seria = select_seria.get_attribute('href')
