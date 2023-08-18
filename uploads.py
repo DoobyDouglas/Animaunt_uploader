@@ -22,20 +22,22 @@ def upload(master: tk.Tk, uploads: str, key: str):
         text.delete('1.0', tk.END)
         text.config(state=tk.DISABLED)
     episodes = analyze(master, uploads, key)
-    options = get_options()
     pb = master.nametowidget('links_list_frame.pb')
     pb.config(maximum=(len(episodes)))
     text = master.nametowidget('links_list_frame.findanime_links')
     try:
+        options = get_options()
+        if key == 'anime':
+            driver = webdriver.Chrome(options=options)
+            driver.minimize_window()
+        elif key == 'dorama':
+            options.add_argument("--headless")
+            driver = webdriver.Chrome(options=options)
         for episode in episodes:
             if key == 'anime':
-                driver = webdriver.Chrome(options=options)
-                driver.minimize_window()
                 parse_animaunt(driver, episode)
                 pb.step(1)
             elif key == 'dorama':
-                options.add_argument("--headless")
-                driver = webdriver.Chrome(options=options)
                 parse_malfurik(driver, episode)
                 pb.step(1)
         pb['value'] = 0
@@ -191,6 +193,15 @@ def analyze(master: tk.Tk, uploads: str, key: str) -> List[Anime or Dorama]:
                             try:
                                 epsd.animaunt_link = data[epsd.name]['animaunt_link']
                                 flag = True
+                                try:
+                                    epsd.findanime_link = data[epsd.name]['findanime_link']
+                                except KeyError:
+                                    pass
+                                try:
+                                    epsd.anime_365_link = data[epsd.name]['anime_365_link']
+                                    epsd.path = data[epsd.name]['path']
+                                except KeyError:
+                                    pass
                             except KeyError:
                                 pass
                 elif key == 'dorama':
