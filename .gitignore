@@ -9,6 +9,7 @@ __pycache__/
 # Distribution / packaging
 .Python
 anime.json
+AnimauntUploader.ini
 build/
 develop-eggs/
 dist/

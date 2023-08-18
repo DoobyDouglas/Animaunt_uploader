@@ -5,7 +5,6 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.keys import Keys
 from models import Anime, Dorama
-from typing import List
 import getpass
 import re
 import time
@@ -19,7 +18,7 @@ CHROME_PATH = (
 
 def get_options() -> webdriver.ChromeOptions:
     options = webdriver.ChromeOptions()
-    #options.add_argument("--headless")
+    # options.add_argument("--headless")
     options.add_argument(CHROME_PATH)
     return options
 

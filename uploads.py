@@ -23,19 +23,26 @@ def upload(master: tk.Tk, uploads: str, key: str):
         text.config(state=tk.DISABLED)
     episodes = analyze(master, uploads, key)
     options = get_options()
-    driver = webdriver.Chrome(options=options)
     pb = master.nametowidget('links_list_frame.pb')
     pb.config(maximum=(len(episodes)))
     text = master.nametowidget('links_list_frame.findanime_links')
     try:
         for episode in episodes:
             if key == 'anime':
+                driver = webdriver.Chrome(options=options)
+                driver.minimize_window()
                 parse_animaunt(driver, episode)
                 pb.step(1)
             elif key == 'dorama':
+                options.add_argument("--headless")
+                driver = webdriver.Chrome(options=options)
                 parse_malfurik(driver, episode)
                 pb.step(1)
         pb['value'] = 0
+        driver.close()
+        options = get_options()
+        options.add_argument("--headless")
+        driver = webdriver.Chrome(options=options)
         for episode in episodes:
             findanime(driver, episode, key)
             text.config(state=tk.NORMAL)
@@ -54,8 +61,10 @@ def upload(master: tk.Tk, uploads: str, key: str):
                 pb.step(1)
         pb['value'] = 0
         upload_bttn.config(state=tk.NORMAL)
+        driver.close()
     except Exception as e:
         upload_bttn.config(state=tk.NORMAL)
+        driver.close()
         print(e)
 
 
