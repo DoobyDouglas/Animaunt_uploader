@@ -11,7 +11,7 @@ from threading import Thread
 
 
 NAME = 'AnimauntUploader'
-VERSION = 0.14
+VERSION = 0.16
 
 
 def on_upload_bttn(

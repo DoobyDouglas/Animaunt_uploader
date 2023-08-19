@@ -42,7 +42,7 @@ def update_or_get_data(
     if not os.path.exists('anime.json'):
         with open('anime.json', 'w', encoding='utf-8') as json_file:
             data = {}
-            json.dump(data, json_file)
+            json.dump(data, json_file, ensure_ascii=False)
     with open('anime.json', 'r', encoding='utf-8') as json_file:
         data = json.load(json_file)
     if get:
@@ -76,7 +76,7 @@ def update_or_get_data(
         pass
         # написать обработку
     with open('anime.json', 'w', encoding='utf-8') as json_file:
-        json.dump(data, json_file)
+        json.dump(data, json_file, ensure_ascii=False)
     if not get and master:
         master.nametowidget('add_ttl_frame.!entry').delete(0, 'end')
         master.nametowidget('add_ttl_frame.!entry2').delete(0, 'end')

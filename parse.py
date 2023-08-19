@@ -167,7 +167,7 @@ def findanime(driver: webdriver.Chrome, episode: Anime or Dorama, key: str):
     time.sleep(1)
     button_post = driver.find_element(By.CLASS_NAME, 'btn-success') #.click()
     button_post.send_keys(Keys.ENTER)
-    episode.resilt_link = found_episode_link
+    episode.result_link = found_episode_link
 
 
 def anime365(driver: webdriver.Chrome, anime: Anime, file_path: str):
