@@ -7,35 +7,41 @@ import ttkbootstrap as tb
 from models import Anime, Dorama
 from parse import parse_animaunt, parse_malfurik
 from typing import List
+import ttkbootstrap as ttk
+import traceback
 
 
 def upload(master: tk.Tk, uploads: str, key: str):
-    upload_bttn = master.nametowidget('upload_list_frame.upload_bttn')
+    upload_bttn: ttk.Button = master.nametowidget(
+        'upload_list_frame.upload_bttn'
+    )
     upload_bttn.config(state=tk.DISABLED)
     txt_widget_names = [
         'links_list_frame.findanime_links',
         'links_list_frame.anime_365_links'
     ]
     for widget_name in txt_widget_names:
-        text = master.nametowidget(widget_name)
+        text: ttk.Text = master.nametowidget(widget_name)
         text.config(state=tk.NORMAL)
         text.delete('1.0', tk.END)
         text.config(state=tk.DISABLED)
     episodes = analyze(master, uploads, key)
-    options = get_options()
-    pb = master.nametowidget('links_list_frame.pb')
+    pb: ttk.Progressbar = master.nametowidget('links_list_frame.pb')
     pb.config(maximum=(len(episodes)))
     text = master.nametowidget('links_list_frame.findanime_links')
     try:
+        options = get_options()
+        if key == 'anime':
+            driver = webdriver.Chrome(options=options)
+            driver.minimize_window()
+        elif key == 'dorama':
+            options.add_argument("--headless")
+            driver = webdriver.Chrome(options=options)
         for episode in episodes:
             if key == 'anime':
-                driver = webdriver.Chrome(options=options)
-                driver.minimize_window()
                 parse_animaunt(driver, episode)
                 pb.step(1)
             elif key == 'dorama':
-                options.add_argument("--headless")
-                driver = webdriver.Chrome(options=options)
                 parse_malfurik(driver, episode)
                 pb.step(1)
         pb['value'] = 0
@@ -46,7 +52,7 @@ def upload(master: tk.Tk, uploads: str, key: str):
         for episode in episodes:
             findanime(driver, episode, key)
             text.config(state=tk.NORMAL)
-            text.insert(tk.END, f'{episode.resilt_link}\n')
+            text.insert(tk.END, f'{episode.result_link}\n')
             text.config(state=tk.DISABLED)
             pb.step(1)
         pb['value'] = 0
@@ -62,10 +68,10 @@ def upload(master: tk.Tk, uploads: str, key: str):
         pb['value'] = 0
         upload_bttn.config(state=tk.NORMAL)
         driver.close()
-    except Exception as e:
+    except Exception:
         upload_bttn.config(state=tk.NORMAL)
         driver.close()
-        print(e)
+        print(traceback.format_exc())
 
 
 def uploads_toplvl(
@@ -191,6 +197,15 @@ def analyze(master: tk.Tk, uploads: str, key: str) -> List[Anime or Dorama]:
                             try:
                                 epsd.animaunt_link = data[epsd.name]['animaunt_link']
                                 flag = True
+                                try:
+                                    epsd.findanime_link = data[epsd.name]['findanime_link']
+                                except KeyError:
+                                    pass
+                                try:
+                                    epsd.anime_365_link = data[epsd.name]['anime_365_link']
+                                    epsd.path = data[epsd.name]['path']
+                                except KeyError:
+                                    pass
                             except KeyError:
                                 pass
                 elif key == 'dorama':
@@ -207,12 +222,16 @@ def analyze(master: tk.Tk, uploads: str, key: str) -> List[Anime or Dorama]:
                             try:
                                 epsd.malfurik_link = data[epsd.name]['malfurik_link']
                                 flag = True
+                                try:
+                                    epsd.doramatv_link = data[epsd.name]['doramatv_link']
+                                except KeyError:
+                                    pass
                             except KeyError:
                                 pass
                 episodes.append(epsd)
         return episodes
-    except Exception as e:
-        print(e)
+    except Exception:
+        print(traceback.format_exc())
 
 
 if __name__ == '__main__':
