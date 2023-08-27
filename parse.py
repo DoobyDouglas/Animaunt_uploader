@@ -74,12 +74,17 @@ def parse_malfurik(driver: webdriver.Chrome, episode: Dorama):
 def findanime(driver: webdriver.Chrome, episode: Anime or Dorama, key: str):
     if key == 'anime':
         if not episode.findanime_link:
-            return 'Нет на Findanime'
+            episode.result_link = 'Нет на Findanime'
+            return
         url = episode.findanime_link
     elif key == 'dorama':
         if not episode.doramatv_link:
-            return 'Нет на Doramatv'
+            episode.result_link = 'Нет на Doramatv'
+            return
         url = episode.doramatv_link
+    if not episode.link:
+        episode.result_link = 'Не удалось получить ссылку для встраивания'
+        return
     code_value = episode.link
     entry_number = episode.number
     driver.get(url)
