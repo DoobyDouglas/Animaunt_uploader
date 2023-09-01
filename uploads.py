@@ -50,7 +50,10 @@ def upload(master: tk.Tk, uploads: str, key: str):
         options.add_argument("--headless")
         driver = webdriver.Chrome(options=options)
         for episode in episodes:
-            findanime(driver, episode, key)
+            try:
+                findanime(driver, episode, key)
+            except Exception:
+                episode.result_link = 'Не удалось загрузить'
             text.config(state=tk.NORMAL)
             text.insert(tk.END, f'{episode.result_link}\n')
             text.config(state=tk.DISABLED)
@@ -59,8 +62,11 @@ def upload(master: tk.Tk, uploads: str, key: str):
         if key != 'dorama':
             text = master.nametowidget('links_list_frame.anime_365_links')
             for episode in episodes:
-                file_path = find_file(episode.path, episode.file)
-                link = anime365(driver, episode, file_path)
+                try:
+                    file_path = find_file(episode.path, episode.file)
+                    link = anime365(driver, episode, file_path)
+                except Exception:
+                    link = 'Не удалось загрузить'
                 text.config(state=tk.NORMAL)
                 text.insert(tk.END, f'{link}\n')
                 text.config(state=tk.DISABLED)
